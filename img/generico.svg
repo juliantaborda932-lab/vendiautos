@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <!-- Imagen genérica para los carros que agrega el usuario -->
+  <rect width="640" height="360" fill="#e9e6df"/>
+  <rect y="262" width="640" height="98" fill="#d6d1c6"/>
+  <path d="M120 238 L140 192 Q150 172 172 168 L250 160 L300 118 Q314 106 336 106 L432 106 Q452 106 466 120 L512 166 L540 172 Q566 178 570 204 L572 238 Z" fill="#2a2d33"/>
+  <path d="M312 126 Q320 118 336 118 L392 118 L392 162 L272 162 Z" fill="#b9c7d3"/>
+  <path d="M404 118 L430 118 Q446 118 456 128 L490 162 L404 162 Z" fill="#b9c7d3"/>
+  <rect x="120" y="236" width="452" height="16" rx="6" fill="#1b1d21"/>
+  <circle cx="210" cy="246" r="38" fill="#1b1d21"/>
+  <circle cx="210" cy="246" r="17" fill="#9a9a9a"/>
+  <circle cx="480" cy="246" r="38" fill="#1b1d21"/>
+  <circle cx="480" cy="246" r="17" fill="#9a9a9a"/>
+  <rect x="548" y="186" width="20" height="10" rx="3" fill="#f2a93b"/>
+  <text x="320" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#5a5a5a">Vendiautos · foto pendiente</text>
+</svg>

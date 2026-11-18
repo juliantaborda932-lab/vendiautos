@@ -1,0 +1,790 @@
+/* =====================================================================
+   estilos.css · Vendiautos · Proyecto final
+   Clases con BEM: bloque__elemento--modificador.
+   Ejemplo: .tarjeta (bloque), .tarjeta__precio (elemento),
+   .tarjeta--agotada (modificador que activa JavaScript con classList).
+   ===================================================================== */
+
+/* ----- Colores del sitio (variables para no repetir valores) ----- */
+:root {
+    --color-oscuro: #1b1d21;
+    --color-lateral: #2a2d33;
+    --color-borde-oscuro: #44484f;
+    --color-acento: #f2a93b;
+    --color-acento-fuerte: #d98f22;
+    --color-acento-suave: #fff7e8;
+    --color-rojo: #c1443c;
+    --color-rojo-fuerte: #a8362f;
+    --color-rojo-suave: #fdf0ef;
+    --color-verde: #4b8b5b;
+    --color-gris: #6b6f76;
+    --color-texto: #222;
+    --color-texto-suave: #555;
+    --color-fondo: #f4f4f4;
+    --color-borde: #ccc;
+}
+
+/* ----- Base: reglas generales de etiquetas ----- */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: var(--color-texto);
+    background-color: var(--color-fondo);
+}
+
+h1,
+h2,
+h3 {
+    color: var(--color-oscuro);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid var(--color-borde);
+    padding: 8px;
+    text-align: left;
+}
+
+thead {
+    background-color: var(--color-oscuro);
+    color: white;
+}
+
+tfoot td {
+    font-size: 0.85rem;
+    color: var(--color-texto-suave);
+}
+
+/* Se ve el foco al navegar con teclado */
+:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: 2px;
+}
+
+
+/* =====================================================================
+   CABECERA
+   ===================================================================== */
+.cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background-color: var(--color-oscuro);
+}
+
+.cabecera__logo {
+    margin: 0;
+    color: white;
+    font-size: 1.4rem;
+}
+
+.cabecera__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+}
+
+.cabecera__enlace {
+    color: white;
+    text-decoration: none;
+}
+
+.cabecera__enlace:hover {
+    color: var(--color-acento);
+}
+
+
+/* =====================================================================
+   ESTRUCTURA: barra lateral + contenido (Flexbox)
+   ===================================================================== */
+.pagina {
+    display: flex;
+}
+
+.pagina__contenido {
+    flex: 1;
+    min-width: 0;
+    padding: 20px 30px;
+}
+
+
+/* =====================================================================
+   BARRA LATERAL
+   ===================================================================== */
+.lateral {
+    flex-shrink: 0;
+    width: 240px;
+    padding: 20px 15px;
+    background-color: var(--color-lateral);
+    color: white;
+}
+
+.lateral__bloque {
+    margin-bottom: 25px;
+}
+
+.lateral__titulo {
+    margin: 0 0 10px;
+    color: var(--color-acento);
+    font-size: 1rem;
+}
+
+
+/* ----- Filtros por categoría (botones creados con JavaScript) ----- */
+.filtros {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.filtros__boton {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-borde-oscuro);
+    border-radius: 4px;
+    background-color: transparent;
+    color: white;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.filtros__boton:hover {
+    background-color: #3a3e45;
+}
+
+/* Categoría seleccionada */
+.filtros__boton--activo,
+.filtros__boton--activo:hover {
+    border-color: var(--color-acento);
+    background-color: var(--color-acento);
+    color: var(--color-oscuro);
+    font-weight: bold;
+}
+
+.filtros__numero {
+    opacity: 0.8;
+}
+
+
+/* ----- Resumen calculado con filter y reduce ----- */
+.resumen {
+    margin: 0;
+}
+
+.resumen__fila {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--color-borde-oscuro);
+}
+
+.resumen__valor {
+    margin: 0;
+    font-weight: bold;
+    text-align: right;
+}
+
+
+/* =====================================================================
+   BOTONES
+   ===================================================================== */
+.boton {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 2px;
+    font: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.boton:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.boton--primario {
+    background-color: var(--color-rojo);
+    color: white;
+}
+
+.boton--primario:hover:not(:disabled) {
+    background-color: var(--color-rojo-fuerte);
+}
+
+.boton--secundario {
+    background-color: var(--color-gris);
+    color: white;
+}
+
+.boton--secundario:hover:not(:disabled) {
+    background-color: #4f5258;
+}
+
+.boton--editar {
+    background-color: var(--color-acento);
+    color: var(--color-oscuro);
+}
+
+.boton--editar:hover {
+    background-color: var(--color-acento-fuerte);
+}
+
+.boton--eliminar {
+    background-color: #2a2d33;
+    color: white;
+}
+
+.boton--eliminar:hover {
+    background-color: var(--color-rojo);
+}
+
+/* Botón de borde (Restaurar datos de ejemplo) */
+.boton--fantasma {
+    width: 100%;
+    border: 1px solid var(--color-acento);
+    border-radius: 4px;
+    background-color: transparent;
+    color: var(--color-acento);
+}
+
+.boton--fantasma:hover {
+    background-color: var(--color-acento);
+    color: var(--color-oscuro);
+}
+
+
+/* =====================================================================
+   SECCIONES DEL CONTENIDO
+   ===================================================================== */
+.banner,
+.seccion {
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--color-borde);
+}
+
+.banner__eslogan {
+    font-size: 1.1rem;
+}
+
+
+/* =====================================================================
+   FORMULARIOS (publicar carro y contacto)
+   ===================================================================== */
+.formulario--carro {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0 20px;
+    padding: 15px;
+    border: 1px solid var(--color-borde);
+    background-color: white;
+}
+
+/* Formulario en modo edición */
+.formulario--editando {
+    border: 2px solid var(--color-acento);
+    background-color: var(--color-acento-suave);
+}
+
+.formulario__etiqueta {
+    display: block;
+    font-weight: bold;
+}
+
+.formulario__entrada {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 320px;
+    margin: 4px 0 10px;
+    padding: 6px;
+    font: inherit;
+}
+
+/* Campo marcado cuando falla una validación */
+.formulario__entrada--error {
+    border: 2px solid var(--color-rojo);
+    background-color: var(--color-rojo-suave);
+}
+
+/* Los botones ocupan toda la fila de abajo del formulario */
+.formulario__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    grid-column: 1 / -1;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.formulario__grupo {
+    margin-bottom: 15px;
+    padding: 15px;
+}
+
+
+/* ----- Mensajes de error y de éxito ----- */
+.mensaje {
+    min-height: 1.2em;
+    font-weight: bold;
+}
+
+.mensaje--error {
+    color: var(--color-rojo);
+}
+
+.mensaje--exito {
+    color: var(--color-verde);
+}
+
+.mensaje__lista {
+    margin: 0;
+    padding-left: 20px;
+}
+
+
+/* =====================================================================
+   FILTRADO: buscador + disponibilidad + contador
+   ===================================================================== */
+.filtrado {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0 20px;
+    margin: 20px 0 10px;
+}
+
+.filtrado__campo {
+    flex: 1 1 220px;
+    max-width: 320px;
+}
+
+.filtrado__etiqueta {
+    display: block;
+    font-weight: bold;
+}
+
+.filtrado__entrada {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 4px 0 10px;
+    padding: 6px;
+    font: inherit;
+}
+
+.filtrado__contador {
+    margin: 0 0 14px;
+    color: var(--color-texto-suave);
+}
+
+
+/* =====================================================================
+   CATÁLOGO DE TARJETAS (Flexbox)
+   ===================================================================== */
+.catalogo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* Aviso cuando no hay coincidencias */
+.aviso {
+    flex: 1 1 100%;
+    margin: 0;
+    padding: 15px 20px;
+    border-left: 4px solid var(--color-acento);
+    background-color: var(--color-acento-suave);
+}
+
+.tarjeta {
+    display: flex;
+    flex: 1 1 280px;
+    max-width: 480px;
+    flex-direction: column;
+    padding: 15px;
+    border: 1px solid var(--color-borde);
+    background-color: white;
+}
+
+/* aspect-ratio: todas las fotos se recortan igual (16:9) */
+.tarjeta__imagen {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    margin-bottom: 10px;
+    object-fit: cover;
+    border-radius: 2px;
+}
+
+.tarjeta__categoria {
+    align-self: flex-start;
+    margin: 4px 0;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background-color: var(--color-oscuro);
+    color: white;
+    font-size: 0.8rem;
+}
+
+.tarjeta__titulo {
+    margin: 4px 0;
+}
+
+.tarjeta__precio {
+    margin: 4px 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.tarjeta__dolares,
+.tarjeta__detalle {
+    margin: 4px 0;
+    color: var(--color-texto-suave);
+}
+
+.tarjeta__stock {
+    margin: 4px 0;
+    color: var(--color-verde);
+    font-weight: bold;
+}
+
+.tarjeta__acciones {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 8px;
+}
+
+/* Pocas unidades: borde ámbar */
+.tarjeta--pocas {
+    border-left: 5px solid var(--color-acento);
+}
+
+.tarjeta--pocas .tarjeta__stock {
+    color: #b7791f;
+}
+
+/* Agotado: foto en gris y texto rojo */
+.tarjeta--agotada {
+    border-left: 5px solid var(--color-rojo);
+}
+
+.tarjeta--agotada .tarjeta__imagen {
+    filter: grayscale(100%);
+    opacity: 0.6;
+}
+
+.tarjeta--agotada .tarjeta__stock {
+    color: var(--color-rojo);
+}
+
+/* Tarjeta que se está editando */
+.tarjeta--editando {
+    outline: 3px solid var(--color-acento);
+    outline-offset: 2px;
+}
+
+
+/* =====================================================================
+   TABLAS (inventario, historial de la TRM y Plan Retoma)
+   ===================================================================== */
+/* Si la tabla no cabe en el celular, se desplaza de lado */
+.marco-tabla {
+    overflow-x: auto;
+}
+
+.tabla {
+    margin-top: 10px;
+    background-color: white;
+}
+
+.tabla__leyenda {
+    margin-bottom: 6px;
+    color: var(--color-texto-suave);
+    text-align: left;
+}
+
+/* Botón del encabezado que ordena la columna */
+.tabla__orden {
+    padding: 0;
+    border: none;
+    background: none;
+    color: white;
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.tabla__orden::after {
+    content: " ↕";
+    opacity: 0.5;
+}
+
+.tabla__orden--asc::after {
+    content: " ▲";
+    opacity: 1;
+}
+
+.tabla__orden--desc::after {
+    content: " ▼";
+    opacity: 1;
+}
+
+.tabla__fila--agotada {
+    background-color: var(--color-rojo-suave);
+    color: #8a2f29;
+}
+
+.tabla__numero {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.tabla--compacta {
+    max-width: 480px;
+}
+
+
+/* ----- Barra de stock (<progress>) con color según el nivel ----- */
+.stock {
+    width: 70px;
+    height: 12px;
+    margin-right: 6px;
+    vertical-align: middle;
+    appearance: none;
+    border: 1px solid var(--color-borde);
+    border-radius: 4px;
+    background-color: white;
+}
+
+.stock::-webkit-progress-bar {
+    border-radius: 4px;
+    background-color: white;
+}
+
+.stock--alto::-webkit-progress-value {
+    background-color: var(--color-verde);
+}
+
+.stock--medio::-webkit-progress-value {
+    background-color: var(--color-acento);
+}
+
+.stock--bajo::-webkit-progress-value {
+    background-color: var(--color-rojo);
+}
+
+.stock--alto::-moz-progress-bar {
+    background-color: var(--color-verde);
+}
+
+.stock--medio::-moz-progress-bar {
+    background-color: var(--color-acento);
+}
+
+.stock--bajo::-moz-progress-bar {
+    background-color: var(--color-rojo);
+}
+
+
+/* ----- Paginación y exportar ----- */
+.paginacion {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0 25px;
+}
+
+.paginacion__info {
+    margin: 0;
+}
+
+.paginacion__exportar {
+    margin-left: auto;
+}
+
+
+/* ----- Medidor de satisfacción (<meter>) ----- */
+.medidor {
+    width: 100%;
+    max-width: 300px;
+    height: 20px;
+}
+
+
+/* =====================================================================
+   DÓLAR HOY (datos de la API)
+   ===================================================================== */
+.trm__estado {
+    min-height: 1.2em;
+    font-weight: bold;
+}
+
+/* Indicador de carga: un círculo que gira */
+.trm__estado--cargando::before {
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    vertical-align: -2px;
+    border: 3px solid var(--color-borde);
+    border-top-color: var(--color-rojo);
+    border-radius: 50%;
+    animation: girar 0.8s linear infinite;
+}
+
+.trm__estado--error {
+    padding: 12px 15px;
+    border-left: 4px solid var(--color-rojo);
+    background-color: var(--color-rojo-suave);
+    color: var(--color-rojo);
+}
+
+@keyframes girar {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.trm__valor {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.trm__fecha {
+    margin: 0 0 10px;
+    color: var(--color-texto-suave);
+}
+
+.trm__datos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 30px;
+    margin: 0 0 10px;
+}
+
+.trm__dato {
+    margin: 0;
+    font-weight: bold;
+}
+
+.trm__cambio--sube {
+    color: var(--color-rojo);
+}
+
+.trm__cambio--baja {
+    color: var(--color-verde);
+}
+
+.trm__fuente {
+    color: var(--color-texto-suave);
+}
+
+
+/* =====================================================================
+   CONTENIDO FIJO (guía, ranking, mercado y categorías)
+   ===================================================================== */
+.guia__termino {
+    font-weight: bold;
+}
+
+.guia__detalle {
+    margin: 0 0 10px 20px;
+}
+
+.dato-mercado {
+    margin-top: 20px;
+    padding: 15px 20px;
+    border-left: 4px solid var(--color-acento);
+    background-color: var(--color-acento-suave);
+}
+
+.dato-mercado__titulo {
+    margin-top: 0;
+}
+
+.categorias {
+    padding: 0;
+    list-style: none;
+}
+
+.categorias__item {
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    border-left: 4px solid var(--color-oscuro);
+    background-color: white;
+}
+
+
+/* =====================================================================
+   PIE DE PÁGINA
+   ===================================================================== */
+.pie {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 10px;
+    padding: 20px;
+    background-color: var(--color-oscuro);
+    color: white;
+}
+
+.pie__titulo {
+    color: white;
+}
+
+.pie__enlace {
+    color: white;
+}
+
+.pie__direccion {
+    font-style: normal;
+}
+
+.pie__copy {
+    flex-basis: 100%;
+    text-align: center;
+}
+
+
+/* =====================================================================
+   CELULAR: la barra lateral pasa arriba del contenido
+   ===================================================================== */
+@media (max-width: 768px) {
+    .pagina {
+        flex-direction: column;
+    }
+
+    .lateral {
+        width: auto;
+    }
+
+    .pagina__contenido {
+        padding: 15px;
+    }
+
+    .paginacion__exportar {
+        margin-left: 0;
+    }
+
+    th,
+    td {
+        padding: 6px 4px;
+        font-size: 0.85rem;
+    }
+}

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<!--
+  Vendiautos · Proyecto final
+  Herramientas de Programación III (ET0056) · I.U. Pascual Bravo · 2026-2
+  Autor: Julián Taborda Bedoya
+
+  El JavaScript está separado por capas (ver README.md):
+    js/modelo/modelo.js            datos, reglas de negocio y localStorage
+    js/servicios/api.js            consumo de la API REST de la TRM
+    js/vista/vista.js              todo lo que toca el DOM
+    js/controlador/controlador.js  eventos y flujo
+    js/app.js                      punto de arranque
+-->
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vendiautos: compra y venta de carros usados">
+    <title>Vendiautos - Compra y venta de carros</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+    <!-- CABECERA: único h1 de la página y menú con enlaces a cada sección -->
+    <header class="cabecera" id="inicio">
+        <h1 class="cabecera__logo">Vendiautos</h1>
+        <nav class="cabecera__nav" aria-label="Navegación principal">
+            <a class="cabecera__enlace" href="#inicio">Inicio</a>
+            <a class="cabecera__enlace" href="#catalogo">Catálogo</a>
+            <a class="cabecera__enlace" href="#inventario">Inventario</a>
+            <a class="cabecera__enlace" href="#dolar">Dólar hoy</a>
+            <a class="cabecera__enlace" href="#especificaciones">Vender mi carro</a>
+            <a class="cabecera__enlace" href="#promociones">Más vendidos</a>
+            <a class="cabecera__enlace" href="#contacto">Contacto</a>
+        </nav>
+    </header>
+
+    <div class="pagina">
+
+        <!-- BARRA LATERAL: filtros por categoría y resumen. En celular pasa arriba -->
+        <aside class="lateral" aria-label="Filtros y resumen">
+            <section class="lateral__bloque">
+                <h2 class="lateral__titulo">Filtrar por categoría</h2>
+                <!-- Los botones los crea JavaScript -->
+                <ul class="filtros" id="listaCategorias"></ul>
+            </section>
+
+            <section class="lateral__bloque">
+                <h2 class="lateral__titulo">Resumen</h2>
+                <dl class="resumen">
+                    <div class="resumen__fila"><dt>Carros en catálogo</dt><dd class="resumen__valor" id="resumenTotal">0</dd></div>
+                    <div class="resumen__fila"><dt>Unidades disponibles</dt><dd class="resumen__valor" id="resumenUnidades">0</dd></div>
+                    <div class="resumen__fila"><dt>Modelos agotados</dt><dd class="resumen__valor" id="resumenAgotados">0</dd></div>
+                    <div class="resumen__fila"><dt>Valor del inventario</dt><dd class="resumen__valor" id="resumenValor">$ 0</dd></div>
+                    <div class="resumen__fila"><dt>Precio promedio</dt><dd class="resumen__valor" id="resumenPromedio">$ 0</dd></div>
+                    <div class="resumen__fila"><dt>Inventario en dólares</dt><dd class="resumen__valor" id="resumenDolares">—</dd></div>
+                </dl>
+            </section>
+
+            <section class="lateral__bloque">
+                <button type="button" class="boton boton--fantasma" id="botonRestaurar">Restaurar datos de ejemplo</button>
+            </section>
+        </aside>
+
+        <main class="pagina__contenido">
+
+            <!-- 1. BIENVENIDA -->
+            <section class="banner">
+                <h2 class="banner__titulo">Bienvenido a Vendiautos</h2>
+                <p class="banner__eslogan">Tu próximo carro, <em>revisado y listo para rodar</em>.</p>
+                <p>Compramos y vendemos carros usados con <strong>garantía incluida</strong> en cada negocio.</p>
+            </section>
+
+            <!-- 2. CATÁLOGO: formulario (crear y editar), filtros y tarjetas -->
+            <section class="seccion" id="catalogo">
+                <h2 class="seccion__titulo">Catálogo</h2>
+
+                <h3 class="seccion__subtitulo" id="tituloFormulario">Publicar un carro</h3>
+                <!-- novalidate: estos datos los revisa Modelo.validar() -->
+                <form class="formulario formulario--carro" id="formCarro" novalidate>
+                    <div class="formulario__campo">
+                        <label class="formulario__etiqueta" for="nombre">Marca y modelo *</label>
+                        <input class="formulario__entrada" type="text" id="nombre" placeholder="Ej. Kia Picanto" autocomplete="off">
+                    </div>
+                    <div class="formulario__campo">
+                        <label class="formulario__etiqueta" for="anio">Año *</label>
+                        <input class="formulario__entrada" type="number" id="anio" placeholder="Ej. 2021">
+                    </div>
+                    <div class="formulario__campo">
+                        <label class="formulario__etiqueta" for="categoria">Categoría *</label>
+                        <!-- Las opciones las pone JavaScript -->
+                        <select class="formulario__entrada" id="categoria"></select>
+                    </div>
+                    <div class="formulario__campo">
+                        <label class="formulario__etiqueta" for="precio">Precio en pesos *</label>
+                        <input class="formulario__entrada" type="number" id="precio" placeholder="Ej. 54900000">
+                    </div>
+                    <div class="formulario__campo">
+                        <label class="formulario__etiqueta" for="kilometraje">Kilometraje *</label>
+                        <input class="formulario__entrada" type="number" id="kilometraje" placeholder="Ej. 35000">
+                    </div>
+                    <div class="formulario__campo">
+                        <label class="formulario__etiqueta" for="unidades">Unidades *</label>
+                        <input class="formulario__entrada" type="number" id="unidades" placeholder="De 0 a 5">
+                    </div>
+                    <div class="formulario__acciones">
+                        <button type="submit" class="boton boton--primario" id="botonGuardar">Publicar carro</button>
+                        <button type="button" class="boton boton--secundario" id="botonCancelar" hidden>Cancelar</button>
+                    </div>
+                </form>
+                <!-- Mensajes de error o de éxito del formulario -->
+                <div class="mensaje" id="mensajeCarro" aria-live="polite"></div>
+
+                <!-- Filtros combinados: texto + estado + categoría de la barra lateral -->
+                <div class="filtrado">
+                    <div class="filtrado__campo">
+                        <label class="filtrado__etiqueta" for="buscador">Buscar por nombre o año</label>
+                        <input class="filtrado__entrada" type="search" id="buscador" placeholder="Ej. toyota">
+                    </div>
+                    <div class="filtrado__campo">
+                        <label class="filtrado__etiqueta" for="filtroEstado">Disponibilidad</label>
+                        <select class="filtrado__entrada" id="filtroEstado">
+                            <option value="todos">Todos</option>
+                            <option value="disponibles">Disponibles</option>
+                            <option value="ultimas">Últimas unidades (1 o 2)</option>
+                            <option value="agotados">Agotados</option>
+                        </select>
+                    </div>
+                    <p class="filtrado__contador" id="contador" aria-live="polite">0 resultados</p>
+                </div>
+
+                <!-- Vacío a propósito: JavaScript pone aquí las tarjetas -->
+                <div class="catalogo" id="contenedorCarros"></div>
+            </section>
+
+            <!-- 3. INVENTARIO: tabla con orden por columna, paginación y CSV -->
+            <section class="seccion" id="inventario">
+                <h2 class="seccion__titulo">Inventario</h2>
+                <p>La tabla usa los mismos filtros del catálogo. Haz clic en un encabezado para ordenar.</p>
+
+                <div class="marco-tabla">
+                    <table class="tabla" id="tablaInventario">
+                        <caption class="tabla__leyenda">Inventario de Vendiautos</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col" data-columna="nombre"><button type="button" class="tabla__orden" data-columna="nombre">Carro</button></th>
+                                <th scope="col" data-columna="categoria"><button type="button" class="tabla__orden" data-columna="categoria">Categoría</button></th>
+                                <th scope="col" data-columna="anio"><button type="button" class="tabla__orden" data-columna="anio">Año</button></th>
+                                <th scope="col" data-columna="precio"><button type="button" class="tabla__orden" data-columna="precio">Precio</button></th>
+                                <th scope="col">Precio USD</th>
+                                <th scope="col" data-columna="kilometraje"><button type="button" class="tabla__orden" data-columna="kilometraje">Km</button></th>
+                                <th scope="col" data-columna="unidades"><button type="button" class="tabla__orden" data-columna="unidades">Stock</button></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpoTabla"></tbody>
+                    </table>
+                </div>
+
+                <div class="paginacion">
+                    <button type="button" class="boton boton--secundario" id="botonAnterior">Anterior</button>
+                    <p class="paginacion__info" id="infoPagina" aria-live="polite">Página 1 de 1</p>
+                    <button type="button" class="boton boton--secundario" id="botonSiguiente">Siguiente</button>
+                    <button type="button" class="boton boton--primario paginacion__exportar" id="botonCsv">Exportar a CSV</button>
+                </div>
+
+                <h3 class="seccion__subtitulo">Satisfacción general de los clientes</h3>
+                <meter class="medidor" min="0" max="5" value="4.6" low="2" high="4" optimum="5">4.6 de 5</meter>
+                <p>4.6 de 5 estrellas, según nuestros compradores</p>
+            </section>
+
+            <!-- 4. DÓLAR HOY: datos de la API REST de la TRM (datos.gov.co) -->
+            <section class="seccion trm" id="dolar">
+                <h2 class="seccion__titulo">Dólar hoy (TRM)</h2>
+                <p>Usamos la Tasa Representativa del Mercado oficial para mostrar el precio de cada carro en dólares.</p>
+
+                <!-- Indicador de carga y mensajes de error de la API -->
+                <p class="trm__estado" id="estadoTrm" aria-live="polite"></p>
+
+                <div class="trm__panel" id="panelTrm" hidden>
+                    <p class="trm__valor" id="valorTrm"></p>
+                    <p class="trm__fecha" id="fechaTrm"></p>
+                    <dl class="trm__datos">
+                        <div><dt>Promedio de los últimos días</dt><dd class="trm__dato" id="promedioTrm"></dd></div>
+                        <div><dt>Valor más alto</dt><dd class="trm__dato" id="maximoTrm"></dd></div>
+                        <div><dt>Valor más bajo</dt><dd class="trm__dato" id="minimoTrm"></dd></div>
+                    </dl>
+
+                    <table class="tabla tabla--compacta">
+                        <caption class="tabla__leyenda">Historial reciente</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Vigente desde</th>
+                                <th scope="col">Valor</th>
+                                <th scope="col">Cambio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historialTrm"></tbody>
+                    </table>
+                </div>
+
+                <button type="button" class="boton boton--secundario" id="botonTrm">Actualizar TRM</button>
+                <p class="trm__fuente"><small>Fuente: Superintendencia Financiera de Colombia, vía datos.gov.co.</small></p>
+            </section>
+
+            <!-- 5. GUÍA DE AVALÚO -->
+            <section class="seccion" id="especificaciones">
+                <h2 class="seccion__titulo">Especificaciones: guía de avalúo</h2>
+                <p>Antes de vender tu carro, ten en cuenta estos factores para estimar su valor comercial.</p>
+                <dl class="guia">
+                    <dt class="guia__termino">Antigüedad</dt>
+                    <dd class="guia__detalle">Por cada año de uso, el valor baja aproximadamente un 4%</dd>
+                    <dt class="guia__termino">Kilometraje</dt>
+                    <dd class="guia__detalle">Por cada 10.000 km recorridos, el valor baja aproximadamente un 2%</dd>
+                    <dt class="guia__termino">Estado general</dt>
+                    <dd class="guia__detalle">Excelente: sin descuento adicional. Bueno: 5% menos. Regular: 15% menos.</dd>
+                </dl>
+                <p>Ejemplo: un carro de 3 años, con 60.000 km y en buen estado, tendría aproximadamente un <strong>29% de descuento</strong> sobre su valor original.</p>
+                <p><small>Valores referenciales, no constituyen una oferta de compra.</small></p>
+            </section>
+
+            <!-- 6. MÁS VENDIDOS Y PLAN RETOMA -->
+            <section class="seccion" id="promociones">
+                <h2 class="seccion__titulo">Productos más vendidos</h2>
+                <p>Los 5 carros que más se vendieron <strong>en Vendiautos</strong> este mes, según nuestro registro interno de ventas:</p>
+                <ol class="ranking">
+                    <li><strong>Tesla Model Y 2025</strong> — 12 unidades vendidas</li>
+                    <li><strong>Mazda 3 2024</strong> — 9 unidades vendidas</li>
+                    <li><strong>Chevrolet Spark GT 2018</strong> — 8 unidades vendidas</li>
+                    <li><strong>Toyota Corolla Cross 2025</strong> — 6 unidades vendidas</li>
+                    <li><strong>Mustang EcoBoost 2019</strong> — 4 unidades vendidas</li>
+                </ol>
+
+                <div class="dato-mercado">
+                    <h3 class="dato-mercado__titulo">Así se mueve el mercado en Colombia</h3>
+                    <p>El país vive uno de sus mejores momentos automotores: entre enero y junio de 2026 se matricularon más de 157.000 carros nuevos, un 50% más que el año anterior, y por primera vez un carro <em>eléctrico</em> lidera las ventas nacionales.</p>
+                    <p><small>Fuente: Andemos, con base en cifras del RUNT (2026).</small></p>
+                </div>
+
+                <h3 class="seccion__subtitulo">Plan Retoma</h3>
+                <p>Suscríbete y cuando quieras cambiar de carro, <strong>entrégalo con nosotros</strong> y recibe descuento en tu próxima compra.</p>
+                <div class="marco-tabla">
+                    <table class="tabla">
+                        <thead>
+                            <tr>
+                                <th scope="col">Plan</th>
+                                <th scope="col">Descuento en retoma</th>
+                                <th scope="col">Beneficio adicional</th>
+                                <th scope="col">Precio suscripción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Básico</td><td>5%</td><td>Avalúo gratis</td><td>$0</td></tr>
+                            <tr><td>Pro</td><td>10%</td><td>Avalúo gratis + prioridad de venta</td><td>$150.000/año</td></tr>
+                            <tr><td>Premium</td><td>15%</td><td>Avalúo gratis + prioridad de venta + carro de cortesía</td><td>$300.000/año</td></tr>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="4">El descuento se aplica sobre el avalúo del carro entregado. Los precios de suscripción incluyen IVA.</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 7. CATEGORÍAS -->
+            <section class="seccion" id="categorias">
+                <h2 class="seccion__titulo">Categorías</h2>
+                <ul class="categorias">
+                    <li class="categorias__item"><strong>Sedán:</strong> carrocería cerrada de 4 puertas y baúl separado. Ideal para ciudad, bajo consumo de combustible.</li>
+                    <li class="categorias__item"><strong>SUV:</strong> más alta que el sedán y con más espacio interior. Pensada para familias y viajes largos.</li>
+                    <li class="categorias__item"><strong>Pickup:</strong> tiene platón de carga descubierto en la parte trasera. La eligen quienes necesitan transportar carga o herramientas.</li>
+                    <li class="categorias__item"><strong>Deportivo:</strong> prioriza la velocidad y el manejo sobre el espacio. Suele tener solo 2 puertas y motor más potente.</li>
+                    <li class="categorias__item"><strong>Eléctrico:</strong> se mueve con batería en vez de gasolina. No tiene tubo de escape y su mantenimiento es más económico.</li>
+                </ul>
+            </section>
+
+            <!-- 8. CONTACTO: aquí valida el navegador (required, type="email", pattern, minlength) -->
+            <section class="seccion" id="contacto">
+                <h2 class="seccion__titulo">Contacto y registro</h2>
+                <form class="formulario formulario--contacto" id="formContacto">
+                    <fieldset class="formulario__grupo">
+                        <legend class="formulario__leyenda">Datos personales</legend>
+                        <label class="formulario__etiqueta" for="contactoNombre">Nombre completo *</label>
+                        <input class="formulario__entrada" type="text" id="contactoNombre" required minlength="5" placeholder="Mínimo 5 caracteres">
+
+                        <label class="formulario__etiqueta" for="contactoCorreo">Correo electrónico *</label>
+                        <input class="formulario__entrada" type="email" id="contactoCorreo" required placeholder="nombre@correo.com">
+
+                        <label class="formulario__etiqueta" for="contactoTelefono">Teléfono *</label>
+                        <input class="formulario__entrada" type="tel" id="contactoTelefono" required pattern="[0-9]{10}" placeholder="3001234567" title="Diez dígitos, sin espacios ni guiones">
+                    </fieldset>
+
+                    <fieldset class="formulario__grupo">
+                        <legend class="formulario__leyenda">Preferencias de compra</legend>
+                        <label class="formulario__etiqueta" for="contactoPago">Método de pago *</label>
+                        <select class="formulario__entrada" id="contactoPago" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="contado">Contado</option>
+                            <option value="credito">Crédito vehicular</option>
+                            <option value="permuta">Permuta</option>
+                        </select>
+
+                        <label class="formulario__etiqueta" for="contactoMensaje">¿Qué carro te interesa? *</label>
+                        <textarea class="formulario__entrada" id="contactoMensaje" rows="4" required minlength="10" placeholder="Mínimo 10 caracteres"></textarea>
+                    </fieldset>
+
+                    <button type="submit" class="boton boton--primario">Enviar registro</button>
+                </form>
+                <p class="mensaje" id="mensajeContacto" aria-live="polite"></p>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="pie">
+        <div class="pie__columna">
+            <h3 class="pie__titulo">Nuestra sede</h3>
+            <address class="pie__direccion">
+                Institución Universitaria Pascual Bravo<br>
+                Calle 73 N.º 73A - 226<br>
+                Medellín, Colombia<br>
+                Teléfono: <a class="pie__enlace" href="tel:+576044480520">(604) 448 0520</a><br>
+                Email: <a class="pie__enlace" href="mailto:cis@pascualbravo.edu.co">cis@pascualbravo.edu.co</a>
+            </address>
+        </div>
+        <div class="pie__columna">
+            <h3 class="pie__titulo">Síguenos</h3>
+            <a class="pie__enlace" href="https://www.youtube.com/user/iupascualbravo" target="_blank" rel="noopener">YouTube</a><br>
+            <a class="pie__enlace" href="https://www.instagram.com/iupascualbravo/" target="_blank" rel="noopener">Instagram</a><br>
+            <a class="pie__enlace" href="https://x.com/IUPascualBravo" target="_blank" rel="noopener">X</a><br>
+            <a class="pie__enlace" href="https://www.facebook.com/IUPascualBravo" target="_blank" rel="noopener">Facebook</a>
+        </div>
+        <p class="pie__copy">&copy; 2026 Vendiautos. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- El orden importa: datos, servicio de la API, vista, controlador y arranque -->
+    <script src="js/modelo/modelo.js"></script>
+    <script src="js/servicios/api.js"></script>
+    <script src="js/vista/vista.js"></script>
+    <script src="js/controlador/controlador.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
